@@ -54,29 +54,13 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [companies, setCompanies] = useState<Company[]>([]);
 
-  // Fetch companies from Supabase
-  useEffect(() => {
-    async function fetchCompanies() {
-      setIsLoading(true);
-      const supabase = createClient();
+  // Profile state
+  const [profileName, setProfileName] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profileTitle, setProfileTitle] = useState('');
+  const [profileTimezone, setProfileTimezone] = useState('America/New_York');
+  const [profileSaved, setProfileSaved] = useState(false);
 
-      try {
-        const { data, error } = await supabase
-          .from('companies')
-          .select('id, name, short_name, color, bg_color')
-          .order('name');
-
-        if (error) throw error;
-        setCompanies(data || []);
-      } catch (error) {
-        console.error('Error fetching companies:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchCompanies();
-  }, []);
   const [notifications, setNotifications] = useState({
     email: true,
     taskUpdates: true,
@@ -84,12 +68,53 @@ export default function SettingsPage() {
     teamChanges: false,
   });
 
-  // Profile state
-  const [profileName, setProfileName] = useState('John Doe');
-  const [profileEmail, setProfileEmail] = useState('ceo@novacube.com');
-  const [profileTitle, setProfileTitle] = useState('CEO');
-  const [profileTimezone, setProfileTimezone] = useState('America/New_York');
-  const [profileSaved, setProfileSaved] = useState(false);
+  // Fetch user profile and companies from Supabase
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const supabase = createClient();
+
+      try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          // Set email from auth
+          setProfileEmail(user.email || '');
+
+          // Get profile data
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, role')
+            .eq('id', user.id)
+            .single();
+
+          if (profile) {
+            setProfileName(profile.name || user.user_metadata?.name || '');
+            setProfileTitle(profile.role || '');
+          } else {
+            // Use metadata if no profile
+            setProfileName(user.user_metadata?.name || '');
+          }
+        }
+
+        // Fetch companies
+        const { data: companiesData, error } = await supabase
+          .from('companies')
+          .select('id, name, short_name, color, bg_color')
+          .order('name');
+
+        if (error) throw error;
+        setCompanies(companiesData || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   // Company dialog states
   const [addCompanyOpen, setAddCompanyOpen] = useState(false);
