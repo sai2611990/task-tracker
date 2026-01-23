@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm your TaskTracker account</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center;">
+              <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background-color: #18181b; border-radius: 12px; margin-bottom: 24px;">
+                <span style="color: #ffffff; font-size: 24px; font-weight: bold;">T</span>
+              </div>
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #18181b;">Welcome to TaskTracker</h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 0 40px 30px;">
+              <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #52525b;">
+                Thanks for signing up! Please confirm your email address to get started with your account.
+              </p>
+
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="{{ .ConfirmationURL }}" style="display: inline-block; padding: 14px 32px; background-color: #18181b; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 500; border-radius: 8px;">
+                      Confirm Email Address
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 20px 0 0; font-size: 14px; line-height: 20px; color: #71717a;">
+                If you didn't create an account with TaskTracker, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding: 0 40px;">
+              <div style="border-top: 1px solid #e4e4e7;"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px;">
+              <p style="margin: 0 0 8px; font-size: 12px; color: #a1a1aa;">
+                This link will expire in 24 hours.
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #a1a1aa;">
+                If the button doesn't work, copy and paste this link into your browser:
+              </p>
+              <p style="margin: 8px 0 0; font-size: 12px; color: #3b82f6; word-break: break-all;">
+                {{ .ConfirmationURL }}
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Brand footer -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px;">
+          <tr>
+            <td style="padding: 30px 40px; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #a1a1aa;">
+                TaskTracker Pro - Multi-company task management
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
