@@ -499,10 +499,16 @@ export default function TimelinePage() {
   const cellWidth = Math.max(45, zoom * 0.65);
   const rowHeight = 40;
 
-  // Get available departments for filtering (unified list)
-  const availableDepts = departmentTemplates.map(d => ({ id: d.id, name: d.name }));
+  // Get available departments for filtering (from actual database data)
+  const availableDepts = companies.flatMap(c => c.departments).reduce((acc, dept) => {
+    if (!acc.find(d => d.name === dept.name)) {
+      acc.push({ id: dept.id, name: dept.name });
+    }
+    return acc;
+  }, [] as { id: string; name: string }[]);
 
   // Filter companies, departments, and tasks
+  const selectedDeptName = availableDepts.find(d => d.id === selectedDept)?.name;
   const filteredCompanies = (selectedCompany === 'all'
     ? companies
     : companies.filter(c => c.id === selectedCompany)
@@ -510,7 +516,7 @@ export default function TimelinePage() {
     ...company,
     departments: (selectedDept === 'all'
       ? company.departments
-      : company.departments.filter(d => d.id.endsWith(`-${selectedDept}`))
+      : company.departments.filter(d => d.name === selectedDeptName || d.id === selectedDept)
     ).map(dept => ({
       ...dept,
       tasks: selectedSkill === 'all'
