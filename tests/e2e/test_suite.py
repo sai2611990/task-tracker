@@ -655,33 +655,49 @@ def test_logout(page: Page, report: TestReport) -> bool:
         return False
 
 def test_login(page: Page, report: TestReport) -> bool:
-    """Test login with created user"""
+    """Test login with created user - uses fresh context to avoid RSC issues"""
     report.start_test("Login Flow")
     start = datetime.now()
 
     try:
-        page.goto(f"{BASE_URL}/login")
-        page.wait_for_load_state('networkidle')
+        # Create a completely fresh browser context
+        browser = page.context.browser
+        fresh_context = browser.new_context(viewport={'width': 1400, 'height': 900})
+        fresh_page = fresh_context.new_page()
 
-        page.fill('input[type="email"]', TEST_EMAIL)
-        page.fill('input[type="password"]', TEST_PASSWORD)
+        # Navigate to login
+        fresh_page.goto(f"{BASE_URL}/login")
+        fresh_page.wait_for_load_state('networkidle')
+        fresh_page.wait_for_timeout(2000)
 
-        page.click('button[type="submit"]')
-        page.wait_for_timeout(3000)
+        # Wait for email input
+        fresh_page.wait_for_selector('input[type="email"]', state='visible', timeout=15000)
 
-        if '/login' in page.url:
-            errors = get_visible_errors(page)
+        fresh_page.fill('input[type="email"]', TEST_EMAIL)
+        fresh_page.fill('input[type="password"]', TEST_PASSWORD)
+
+        fresh_page.click('button[type="submit"]')
+        fresh_page.wait_for_timeout(3000)
+
+        if '/login' in fresh_page.url:
+            errors = get_visible_errors(fresh_page)
             report.fail_test("Login Flow", "AuthError", f"Login failed. Errors: {errors}",
-                           screenshot(page, "login_failed", report.output_dir))
+                           screenshot(fresh_page, "login_failed", report.output_dir))
+            fresh_context.close()
             return False
 
         duration = int((datetime.now() - start).total_seconds() * 1000)
-        report.pass_test("Login Flow", duration, [screenshot(page, "login_success", report.output_dir)])
+        report.pass_test("Login Flow", duration, [screenshot(fresh_page, "login_success", report.output_dir)])
+        fresh_context.close()
         return True
 
     except Exception as e:
         report.fail_test("Login Flow", "Exception", str(e),
                         screenshot(page, "login_exception", report.output_dir))
+        try:
+            fresh_context.close()
+        except:
+            pass
         return False
 
 def test_responsive_mobile(page: Page, report: TestReport) -> bool:
