@@ -1,6 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 'use client';
+
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { Plus, Building2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';

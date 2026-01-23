@@ -1,6 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 'use client';
+
+export const dynamic = 'force-dynamic';
 
 import { MigrationWizard } from '@/components/migration/migration-wizard';
 
