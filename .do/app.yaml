@@ -9,11 +9,6 @@ services:
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb
     http_port: 3000
-    build_args:
-      - name: NEXT_PUBLIC_SUPABASE_URL
-        value: "https://zlgxekqrlgblgsquvvek.supabase.co"
-      - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
-        value: "sb_publishable_jrRdmZ8xkErc3bNqO-EDVQ_xCPd2l6V"
     envs:
       - key: NEXT_PUBLIC_SUPABASE_URL
         scope: RUN_TIME
