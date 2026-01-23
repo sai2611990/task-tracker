@@ -1,8 +1,6 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
-// AI Chat - uncomment when ANTHROPIC_API_KEY is configured
-// import { ChatProvider } from '@/components/chat/chat-provider';
-// import { ChatWidget } from '@/components/chat/chat-widget';
+import { OnboardingCheck } from '@/components/layout/onboarding-check';
 
 export default function DashboardLayout({
   children,
@@ -10,24 +8,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    // Wrap with <ChatProvider> when enabling AI chat
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main content area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
-        <Header />
-
-        {/* Page content */}
-        <main className="flex-1 overflow-auto bg-background p-6">
-          {children}
-        </main>
+    <OnboardingCheck>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-auto bg-background p-6">
+            {children}
+          </main>
+        </div>
       </div>
-
-      {/* AI Chat Widget - uncomment when ANTHROPIC_API_KEY is configured */}
-      {/* <ChatWidget /> */}
-    </div>
+    </OnboardingCheck>
   );
 }
