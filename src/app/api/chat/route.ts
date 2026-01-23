@@ -511,3 +511,8 @@ Periods: 0-35 (Jan-Dec, 3 periods per month: 1-10, 11-20, 21-31)`;
     );
   }
 }
+
+// Handle OPTIONS for CORS preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
+}

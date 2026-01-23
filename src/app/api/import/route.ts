@@ -301,3 +301,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Handle OPTIONS for CORS preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
+}
