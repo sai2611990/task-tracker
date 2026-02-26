@@ -56,11 +56,18 @@ npx supabase gen types typescript --local > types/supabase.ts  # Generate types
 - **DepartmentTargets**: id, department_id, objective, timeline, status (draft/frozen)
 
 ## User Context
-- CEO of 6 companies (NovaCube + 5 others)
+- CEO of Engineering Square LLC (software consulting + multiple ventures)
+- 3 real companies seeded: Engineering Square, NovaCube, E2 Operations
+- 12 real projects seeded with 31 tasks (see scripts/seed-real-projects.mjs)
 - Prefers weekly timeline view
-- Common departments: Accounts, Contracts, Sales, Support, HR
-- Team members can be shared across departments
 - Executive oversight feature needed (watch without membership)
+
+## Seeded Data (2026-02-26)
+- **Seed script**: `scripts/seed-real-projects.mjs` (run with `node scripts/seed-real-projects.mjs`)
+- **Engineering Square**: Adaptive Software, Korber WMS, REVERT-α, Hetzner Migration, Task Tracker Pro
+- **NovaCube**: Website, Pod v2.0 Hardware, Business Planning
+- **E2 Operations**: Bank Transaction Analysis, Subscription Cleanup, SBA Loan, Tax Filing 2025
+- Task statuses valid values: todo, in_progress, review, completed, blocked (NOT "planning")
 
 ## Environment Variables
 ```
