@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Plus,
   Search,
@@ -11,6 +12,7 @@ import {
   MoreVertical,
   Calendar,
   User,
+  Users,
   Sparkles,
   Code,
   TrendingUp,
@@ -25,6 +27,8 @@ import {
   Trash2,
   Edit,
   Loader2,
+  ExternalLink,
+  UserPlus,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -91,8 +95,12 @@ interface Task {
   status: TaskStatus;
   skill: Skill;
   assignee?: string;
+  managerId?: string;
+  managerName?: string;
   dueDate: string;
   priority: 'low' | 'medium' | 'high';
+  subtaskCount?: number;
+  subtaskProgress?: number;
 }
 
 const skillIcons: Record<Skill, React.ReactNode> = {
@@ -133,6 +141,8 @@ function periodToDate(period: number): string {
 }
 
 export default function TasksPage() {
+  const router = useRouter();
+
   // Loading and data states
   const [isLoading, setIsLoading] = useState(true);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -413,8 +423,28 @@ export default function TasksPage() {
               const skillInfo = skills.find(s => s.id === task.skill);
 
               return (
-                <TableRow key={task.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{task.name}</TableCell>
+                <TableRow
+                  key={task.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => router.push(`/tasks/${task.id}`)}
+                >
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      {task.name}
+                      {task.managerId && (
+                        <Badge variant="outline" className="text-xs">
+                          <UserPlus className="w-3 h-3 mr-1" />
+                          Managed
+                        </Badge>
+                      )}
+                    </div>
+                    {(task.subtaskCount || 0) > 0 && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <Users className="w-3 h-3" />
+                        {task.subtaskProgress}% ({task.subtaskCount} subtasks)
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"

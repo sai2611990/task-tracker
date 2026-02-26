@@ -1,7 +1,4 @@
-
 'use client';
-
-export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { Plus, Building2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
@@ -25,7 +22,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/lib/supabase/client';
 
 interface Company {
   id: string;
@@ -56,83 +52,90 @@ export default function CompaniesPage() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Form state
   const [name, setName] = useState('');
   const [industry, setIndustry] = useState('Technology');
   const [color, setColor] = useState('#3B82F6');
 
-  const supabase = createClient();
-
-  // Fetch companies
   useEffect(() => {
     fetchCompanies();
   }, []);
 
   async function fetchCompanies() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .order('name');
+    setError(null);
 
-    if (error) {
-      console.error('Error fetching companies:', error);
-    } else {
-      setCompanies(data || []);
+    try {
+      const res = await fetch('/api/companies');
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch companies');
+      }
+
+      setCompanies(data.companies || []);
+    } catch (e) {
+      console.error('Error fetching companies:', e);
+      setError(e instanceof Error ? e.message : 'Failed to fetch companies');
     }
+
     setLoading(false);
   }
 
-  // Create or update company
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
 
-    if (editingCompany) {
-      // Update
-      const { error } = await supabase
-        .from('companies')
-        .update({ name, industry, color })
-        .eq('id', editingCompany.id);
+    try {
+      if (editingCompany) {
+        // Update
+        const res = await fetch('/api/companies', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingCompany.id, name, industry, color }),
+        });
 
-      if (error) {
-        console.error('Error updating company:', error);
-        return;
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+      } else {
+        // Create
+        const res = await fetch('/api/companies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, industry, color }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
       }
-    } else {
-      // Create
-      const { error } = await supabase
-        .from('companies')
-        .insert({ name, industry, color });
 
-      if (error) {
-        console.error('Error creating company:', error);
-        return;
-      }
+      setIsDialogOpen(false);
+      resetForm();
+      fetchCompanies();
+    } catch (e) {
+      console.error('Error saving company:', e);
+      setError(e instanceof Error ? e.message : 'Failed to save company');
     }
-
-    setIsDialogOpen(false);
-    resetForm();
-    fetchCompanies();
   }
 
-  // Delete company
   async function handleDelete(id: string) {
     if (!confirm('Are you sure? This will delete all departments, teams, and tasks under this company.')) {
       return;
     }
 
-    const { error } = await supabase
-      .from('companies')
-      .delete()
-      .eq('id', id);
+    try {
+      const res = await fetch(`/api/companies?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
 
-    if (error) {
-      console.error('Error deleting company:', error);
-      return;
+      if (!res.ok) throw new Error(data.error);
+
+      fetchCompanies();
+    } catch (e) {
+      console.error('Error deleting company:', e);
+      setError(e instanceof Error ? e.message : 'Failed to delete company');
     }
-
-    fetchCompanies();
   }
 
   function openEditDialog(company: Company) {
@@ -148,6 +151,7 @@ export default function CompaniesPage() {
     setName('');
     setIndustry('Technology');
     setColor('#3B82F6');
+    setError(null);
   }
 
   function openNewDialog() {
@@ -185,6 +189,11 @@ export default function CompaniesPage() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4 py-4">
+                {error && (
+                  <div className="p-3 bg-red-50 text-red-600 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="name">Company Name</Label>
                   <Input
@@ -237,6 +246,13 @@ export default function CompaniesPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Error Display */}
+      {error && !isDialogOpen && (
+        <div className="p-4 bg-red-50 text-red-600 rounded-md">
+          {error}
+        </div>
+      )}
 
       {/* Companies Grid */}
       {loading ? (

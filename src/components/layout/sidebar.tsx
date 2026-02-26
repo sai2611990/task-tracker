@@ -14,6 +14,7 @@ import {
   Settings,
   ChevronDown,
   Import,
+  Shield,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -29,6 +30,7 @@ const navigation = [
 
 const bottomNavigation = [
   { name: 'Migration', href: '/migration', icon: Import },
+  { name: 'Admin', href: '/admin', icon: Shield },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

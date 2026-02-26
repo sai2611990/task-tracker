@@ -18,7 +18,15 @@ export function ErrorProvider({ children }: { children: React.ReactNode }) {
 
         // Log 4xx and 5xx errors (except 401 which is normal for auth)
         if (response.status >= 400 && response.status !== 401) {
-          const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || 'unknown';
+          let url = 'unknown';
+          const input = args[0];
+          if (typeof input === 'string') {
+            url = input;
+          } else if (input instanceof URL) {
+            url = input.href;
+          } else if (input instanceof Request) {
+            url = input.url;
+          }
           logApiError(
             url,
             response.status,

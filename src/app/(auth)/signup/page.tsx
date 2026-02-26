@@ -25,13 +25,14 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
         },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -41,7 +42,21 @@ export default function SignupPage() {
       return;
     }
 
-    router.push('/timeline');
+    // Check if email confirmation is required
+    if (data?.user?.identities?.length === 0) {
+      // User already exists
+      setError('An account with this email already exists.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (data?.user && !data?.session) {
+      // Email confirmation required
+      router.push('/check-email');
+    } else {
+      // No email confirmation required, go to dashboard
+      router.push('/timeline');
+    }
   };
 
   const handleMicrosoftSignup = async () => {

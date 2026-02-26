@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ChevronDown,
   ChevronRight,
@@ -37,6 +38,8 @@ import {
   Sparkles,
   GitBranch,
   Loader2,
+  ExternalLink,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +71,10 @@ interface Task {
   endPeriod: number;
   status: 'planning' | 'in_progress' | 'completed' | 'blocked';
   skill: Skill;
+  managerId?: string;
+  managerName?: string;
+  subtaskCount?: number;
+  subtaskProgress?: number;
 }
 
 interface Department {
@@ -369,6 +376,7 @@ function TaskBar({
 // ============================================
 
 export default function TimelinePage() {
+  const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
@@ -1181,6 +1189,12 @@ export default function TimelinePage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">{selectedTask.task.name}</CardTitle>
               <div className="flex items-center gap-2">
+                {selectedTask.task.subtaskCount !== undefined && selectedTask.task.subtaskCount > 0 && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Users className="w-3 h-3" />
+                    {selectedTask.task.subtaskProgress}% ({selectedTask.task.subtaskCount} subtasks)
+                  </Badge>
+                )}
                 {selectedSkillInfo && (
                   <Badge
                     variant="outline"
@@ -1198,11 +1212,18 @@ export default function TimelinePage() {
                 }>
                   {selectedTask.task.status.replace('_', ' ')}
                 </Badge>
+                <Button
+                  size="sm"
+                  onClick={() => router.push(`/tasks/${selectedTask.task.id}`)}
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  View Details
+                </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-5 gap-4 text-sm">
               <div>
                 <div className="text-muted-foreground">Company</div>
                 <div className="font-medium">{selectedTask.company}</div>
@@ -1226,6 +1247,14 @@ export default function TimelinePage() {
                 <div className="text-muted-foreground">Timeline</div>
                 <div className="font-medium">
                   {periods[selectedTask.task.startPeriod]?.month} {periods[selectedTask.task.startPeriod]?.period} → {periods[selectedTask.task.endPeriod - 1]?.month} {periods[selectedTask.task.endPeriod - 1]?.period}
+                </div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Manager</div>
+                <div className="font-medium">
+                  {selectedTask.task.managerName || (
+                    <span className="text-muted-foreground italic">Not assigned</span>
+                  )}
                 </div>
               </div>
             </div>

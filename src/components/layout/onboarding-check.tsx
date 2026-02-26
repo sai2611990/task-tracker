@@ -26,7 +26,8 @@ export function OnboardingCheck({ children }: { children: React.ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      if (profile && !profile.onboarding_complete && pathname !== '/onboarding') {
+      // Skip onboarding redirect for admin page
+      if (profile && !profile.onboarding_complete && pathname !== '/onboarding' && pathname !== '/admin') {
         router.push('/onboarding');
       } else {
         setChecking(false);
